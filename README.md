@@ -6,7 +6,7 @@
 [![MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Maintained by OneByJorah](https://img.shields.io/badge/Maintained%20by-OneByJorah-1E90FF?logo=github)](https://github.com/OneByJorah)
 
-![LLM Chat App Template Architecture](https://v3b.fal.media/files/b/0a9e59a6/3Cq6QvN0Qw5qZ7H7vJ0uK4yD9c0g8a.png)
+![LLM Chat App Template Architecture](https://v3b.fal.media/files/b/0a9e5aad/9iuQuoYxA_QDwjyjR7kcK_BHnchy8B.png)
 
 > **LLM Chat App Template**: A professional, production-ready template for building LLM-powered chat applications with full-stack architecture, AI integration patterns, and comprehensive documentation.
 
