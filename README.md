@@ -134,8 +134,8 @@ flowchart TB
 
 ```bash
 # Clone the repository
-git clone https://github.com/OneByJorah/llm-chat-app-template.git
-cd llm-chat-app-template
+git clone https://github.com/OneByJorah/ChatForge.git
+cd ChatForge
 
 # Install dependencies
 pip install -r requirements.txt
@@ -299,7 +299,7 @@ MIT License — free to use, modify, and distribute.
 
 For issues or questions, please open an issue on GitHub:
 
-https://github.com/OneByJorah/llm-chat-app-template/issues
+https://github.com/OneByJorah/ChatForge/issues
 
 ---
 
