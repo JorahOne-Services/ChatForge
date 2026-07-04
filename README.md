@@ -1,143 +1,97 @@
-# ChatForge — Cloudflare Workers AI Chat
+<div align="center">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+  <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white">
+  <img src="https://img.shields.io/badge/Workers%20AI-000?style=for-the-badge&logo=cloudflareworkers&logoColor=white">
+</div>
 
-**Version:** v1.0  
-**Status:** Active Development  
-**Repository:** https://github.com/OneByJorah/ChatForge
+<br>
 
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Service Management](#service-management)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
-- [Author](#author)
-
----
-
-## Overview
-
-ChatForge is a simple chat application powered by Cloudflare Workers AI. It runs entirely on the edge, uses Workers AI for model inference, and streams responses to a lightweight HTML5 frontend.
+<div align="center">
+  <h1>💬 ChatForge</h1>
+  <p><strong>Lightweight, Edge-Native AI Chat Application</strong></p>
+  <p>Zero cold-start serverless chat — Cloudflare Workers AI-powered streaming responses</p>
+  <p>
+    <a href="#-features">Features</a> •
+    <a href="#-quick-start">Quick Start</a> •
+    <a href="#-architecture">Architecture</a> •
+    <a href="#-deployment">Deployment</a> •
+    <a href="#-development">Development</a>
+  </p>
+</div>
 
 ---
 
-## Architecture
+## ✨ Features
 
-Client browser → static frontend (`public/index.html` + `public/chat.js`) → Cloudflare Worker (`src/index.ts`) → Workers AI → streaming response.
+- **Edge-Native** — Runs entirely on Cloudflare Workers, zero cold-start serverless
+- **Streaming Responses** — Real-time token delivery via streaming
+- **No Origin Server** — Browser communicates directly with the Worker
+- **Minimal Footprint** — Tiny codebase, fast deploys
+- **TypeScript** — Type-safe, modern codebase
+- **Workers AI** — Leverages Cloudflare's global AI inference network
 
-The frontend posts messages to the Worker, which calls Workers AI and streams tokens back. No origin server required.
+## 🚀 Quick Start
 
----
+### Prerequisites
+- Node.js 18+
+- Cloudflare account with Workers enabled
+- Wrangler CLI
 
-## Technology Stack
-
-| Layer | Stack |
-|---|---|
-| Runtime | Cloudflare Workers |
-| Backend | TypeScript / Workers AI |
-| Frontend | HTML5 + JavaScript |
-| Tooling | Wrangler, Vitest, Workers TypeGen |
-| VCS | Git + GitHub (`github.com/OneByJorah/ChatForge`) |
-
----
-
-## Features
-
-- **Edge-native runtime**: Cloudflare Workers with zero cold-start servers.
-- **LLM chat**: Workers AI model inference.
-- **Streaming responses**: live token delivery to the UI.
-- **Typed worker config**: `wrangler.jsonc` + generated types.
-- **Local preview**: Wrangler dev mode for local iteration.
-
----
-
-## Getting Started
+### Installation
 
 ```bash
-# 1. Clone
 git clone https://github.com/OneByJorah/ChatForge.git
 cd ChatForge
-
-# 2. Install
 npm install
-
-# 3. Type generation
-npm run cf-typegen
-
-# Required for `wrangler dev` with AI binding:
-export CLOUDFLARE_API_TOKEN="your-token"
-# 4. Local dev
-npx wrangler dev --port 5175
-
-# 5. Deploy
-npx wrangler deploy
+npm run dev
 ```
 
----
-
-## Service Management
+### Deploy
 
 ```bash
-# Dev loop (local)
-npx wrangler dev
-
-# Dry-run validation
-npm run check
-
-# Publish
-npx wrangler deploy
+npm run deploy
 ```
 
----
-
-## Project Structure
+## 🏗️ Architecture
 
 ```
 ChatForge/
 ├── src/
-│   ├── index.ts
-│   └── types.ts
-├── public/
-│   ├── index.html
-│   └── chat.js
-├── worker-configuration.d.ts
-├── wrangler.jsonc
-├── tsconfig.json
-├── package.json
-└── docs/screenshots/
-    └── chatforge-ui.png
+│   ├── index.ts             # Worker entry point & request handler
+│   └── types.ts             # TypeScript type definitions
+├── public/                  # Static assets
+│   └── ...                  # HTML/CSS/JS frontend
+├── docs/                    # Documentation
+├── wrangler.jsonc           # Cloudflare Worker configuration
+├── tsconfig.json            # TypeScript configuration
+├── package.json             # Dependencies & scripts
+└── worker-configuration.d.ts
 ```
 
+## 🔧 Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start local development server |
+| `npm run deploy` | Deploy to Cloudflare Workers |
+| `npm run test` | Run tests with Vitest |
+| `npm run check` | TypeScript check + dry-run deploy |
+
+## 📡 Technology Stack
+
+- **Runtime:** Cloudflare Workers (JavaScript/TypeScript)
+- **AI:** Workers AI (Cloudflare's global inference)
+- **Frontend:** HTML5 + JavaScript (vanilla)
+- **Testing:** Vitest + @cloudflare/vitest-pool-workers
+- **Deployment:** Wrangler CLI
+
+## 📄 License
+
+MIT © Jhonattan L. Jimenez
+
 ---
 
-## Screenshots
-
-### ChatForge UI
-![ChatForge UI](docs/screenshots/chatforge-ui.png)
-
----
-
-## Contributing
-
-1. Create a feature branch off `main`.
-2. Run `npm run check` before submitting.
-3. Submit a PR with description and screenshots for UI changes.
-
----
-
-## License
-
-MIT
-
----
-
-## Author
-
-Built by **Jhonattan L. Jimenez**.
+<div align="center">
+  <p>⚡ Edge-native AI chat — zero servers, zero cold starts</p>
+  <p><a href="https://github.com/OneByJorah">@OneByJorah</a></p>
+</div>
