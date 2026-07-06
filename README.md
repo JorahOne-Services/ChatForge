@@ -2,6 +2,7 @@
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
   <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white">
   <img src="https://img.shields.io/badge/Workers%20AI-000?style=for-the-badge&logo=cloudflareworkers&logoColor=white">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge">
 </div>
 
 <br>
@@ -102,6 +103,21 @@ ChatForge/
 ## 📄 License
 
 MIT © Jhonattan L. Jimenez
+
+---
+
+## 🤝 Community
+
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Security Policy](SECURITY.md)
+- [Issue Tracker](https://github.com/OneByJorah/ChatForge/issues)
+
+## 📚 Documentation
+
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [API Reference](docs/API.md)
+- [UI Screenshot](docs/screenshots/chatforge-ui.png)
 
 ---
 
