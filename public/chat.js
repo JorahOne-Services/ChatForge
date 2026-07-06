@@ -196,12 +196,21 @@ async function sendMessage() {
 }
 
 /**
+ * Safely escape HTML to prevent XSS
+ */
+function escapeHtml(str) {
+	const div = document.createElement("div");
+	div.textContent = str;
+	return div.innerHTML;
+}
+
+/**
  * Helper function to add message to chat
  */
 function addMessageToChat(role, content) {
 	const messageEl = document.createElement("div");
 	messageEl.className = `message ${role}-message`;
-	messageEl.innerHTML = `<p>${content}</p>`;
+	messageEl.innerHTML = `<p>${escapeHtml(content)}</p>`;
 	chatMessages.appendChild(messageEl);
 
 	// Scroll to bottom
