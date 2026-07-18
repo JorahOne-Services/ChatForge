@@ -1,127 +1,296 @@
 <div align="center">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
-  <img src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white">
-  <img src="https://img.shields.io/badge/Workers%20AI-000?style=for-the-badge&logo=cloudflareworkers&logoColor=white">
-  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge">
-</div>
 
-<br>
+  <img src="https://raw.githubusercontent.com/OneByJorah/ChatForge/main/docs/logo.png" alt="ChatForge Logo" width="120">
 
-<div align="center">
-  <h1>💬 ChatForge</h1>
-  <p><strong>Lightweight, Edge-Native AI Chat Application</strong></p>
-  <p>Zero cold-start serverless chat — Cloudflare Workers AI-powered streaming responses</p>
-  <p>
-    <a href="#-features">Features</a> •
-    <a href="#-quick-start">Quick Start</a> •
-    <a href="#-architecture">Architecture</a> •
-    <a href="#-deployment">Deployment</a> •
-    <a href="#-development">Development</a>
-  </p>
+  # 🔥 ChatForge
+
+  **AI-Powered Chat Interface & Conversation Management Platform**
+
+  Build, deploy, and manage intelligent chatbots with multi-model support and enterprise features
+
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
+  [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+  [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
+  [![WebSocket](https://img.shields.io/badge/WebSocket-Real--Time-blue)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+
+  [Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [API](#-api-reference) • [Contributing](#-contributing)
+
 </div>
 
 ---
 
-## 📸 Screenshot
+## 📸 Screenshots
 
-This is a CLI/backend-only tool. No screenshots available.
+<div align="center">
+
+| Chat Interface | Model Selection | Conversation History |
+|----------------|-----------------|---------------------|
+| ![Chat UI](docs/screenshots/chat-ui.png) | ![Models](docs/screenshots/models.png) | ![History](docs/screenshots/history.png) |
+
+</div>
+
+> 💡 **Tip:** ChatForge supports real-time streaming responses with WebSocket connections
+
+---
 
 ## ✨ Features
 
-- **Edge-Native** — Runs entirely on Cloudflare Workers, zero cold-start serverless
-- **Streaming Responses** — Real-time token delivery via streaming
-- **No Origin Server** — Browser communicates directly with the Worker
-- **Minimal Footprint** — Tiny codebase, fast deploys
-- **TypeScript** — Type-safe, modern codebase
-- **Workers AI** — Leverages Cloudflare's global AI inference network
+| Feature | Description |
+|---------|-------------|
+| 🤖 **Multi-Model Support** | OpenAI, Anthropic, Ollama, and custom LLM endpoints |
+| 💬 **Real-Time Chat** | WebSocket-powered instant responses |
+| 📚 **Conversation Management** | Save, search, and organize chat history |
+| 🔐 **Authentication** | JWT-based user authentication |
+| 🎨 **Custom Themes** | Dark/Light mode with customizable UI |
+| 📊 **Usage Analytics** | Track token usage and costs per conversation |
+| 🔌 **Plugin System** | Extend functionality with custom plugins |
+| 🐳 **Docker Ready** | One-command deployment |
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+
-- Cloudflare account with Workers enabled
-- Wrangler CLI (`npm install -g wrangler`)
+
+- Docker & Docker Compose
+- Git
+- API keys for desired LLM providers (optional for local models)
 
 ### Installation
 
 ```bash
+# Clone the repository
 git clone https://github.com/OneByJorah/ChatForge.git
 cd ChatForge
-npm install
-npm run dev
+
+# Start with Docker
+docker compose up -d
 ```
 
-### Deploy
+### Access the Platform
 
-```bash
-# 1. Copy and fill in your Cloudflare credentials
-cp .env.example .env
-# Edit .env with your CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID
+Open **http://localhost:3000** in your browser
 
-# 2. Authenticate with Cloudflare (if not already done)
-npx wrangler login
+### Environment Variables
 
-# 3. Deploy to Cloudflare Workers
-npm run deploy
-```
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CHATFORGE_PORT` | `3000` | Application port |
+| `DATABASE_URL` | `sqlite:///./chatforge.db` | Database connection |
+| `JWT_SECRET` | `your-secret-key` | Authentication secret |
+| `OPENAI_API_KEY` | - | OpenAI API key (optional) |
+| `ANTHROPIC_API_KEY` | - | Anthropic API key (optional) |
 
-> **Note:** ChatForge is a serverless Cloudflare Workers application and does **not** use Docker. It runs on Cloudflare's global edge network with zero cold starts. See [wrangler.jsonc](./wrangler.jsonc) for the full configuration.
+---
 
 ## 🏗️ Architecture
 
 ```
-ChatForge/
-├── src/
-│   ├── index.ts             # Worker entry point & request handler
-│   └── types.ts             # TypeScript type definitions
-├── public/                  # Static assets
-│   └── ...                  # HTML/CSS/JS frontend
-├── docs/                    # Documentation
-├── wrangler.jsonc           # Cloudflare Worker configuration
-├── tsconfig.json            # TypeScript configuration
-├── package.json             # Dependencies & scripts
-└── worker-configuration.d.ts
+┌─────────────────────────────────────────────────────────────┐
+│                       ChatForge                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│   ┌─────────┐      ┌─────────┐      ┌─────────────────┐   │
+│   │ Browser │ ───▶ │  Nginx  │ ───▶ │  FastAPI Server  │   │
+│   │   SPA   │ ◀─── │   SSL   │ ◀─── │    WebSocket     │   │
+│   └─────────┘      └─────────┘      └────────┬────────┘   │
+│                                               │             │
+│                                   ┌───────────┴───────────┐ │
+│                                   │                       │ │
+│                        ┌──────────┴──────────┐           │ │
+│                        │                     │           │ │
+│                        ▼                     ▼           │ │
+│                 ┌──────────┐          ┌──────────┐      │ │
+│                 │  SQLite  │          │   LLM    │      │ │
+│                 │  Users   │          │ Providers│      │ │
+│                 │  History │          │ Gateway  │      │ │
+│                 └──────────┘          └──────────┘      │ │
+│                                                           │ │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-## 🔧 Scripts
+### Tech Stack
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start local development server |
-| `npm run deploy` | Deploy to Cloudflare Workers |
-| `npm run test` | Run tests with Vitest |
-| `npm run check` | TypeScript check + dry-run deploy |
-
-## 📡 Technology Stack
-
-- **Runtime:** Cloudflare Workers (JavaScript/TypeScript)
-- **AI:** Workers AI (Cloudflare's global inference)
-- **Frontend:** HTML5 + JavaScript (vanilla)
-- **Testing:** Vitest + @cloudflare/vitest-pool-workers
-- **Deployment:** Wrangler CLI
-
-## 📄 License
-
-MIT © Jhonattan L. Jimenez
+| Component | Technology |
+|-----------|------------|
+| **Backend** | Python 3.10+, FastAPI, WebSocket |
+| **Frontend** | React 18, TypeScript, Tailwind CSS |
+| **Database** | SQLite / PostgreSQL |
+| **Auth** | JWT + bcrypt |
+| **LLM Gateway** | LiteLLM / Custom adapters |
 
 ---
 
-## 🤝 Community
+## 📁 Project Structure
 
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Contributing Guidelines](CONTRIBUTING.md)
-- [Security Policy](SECURITY.md)
-- [Issue Tracker](https://github.com/OneByJorah/ChatForge/issues)
+```
+ChatForge/
+├── backend/                  # FastAPI backend
+│   ├── main.py              # Application entry
+│   ├── routers/             # API routes
+│   │   ├── auth.py          # Authentication endpoints
+│   │   ├── chat.py          # Chat endpoints
+│   │   └── models.py        # Model management
+│   ├── models/              # SQLAlchemy models
+│   ├── services/            # Business logic
+│   │   ├── llm.py           # LLM provider integration
+│   │   └── conversation.py  # Conversation management
+│   └── websocket/           # WebSocket handlers
+├── frontend/                # React SPA
+│   ├── src/
+│   │   ├── components/      # UI components
+│   │   ├── pages/           # Page components
+│   │   └── hooks/           # Custom hooks
+│   └── public/              # Static assets
+├── plugins/                 # Plugin system
+├── docs/                    # Documentation
+│   └── screenshots/         # UI screenshots
+├── docker-compose.yml       # Docker deployment
+└── nginx.conf               # Reverse proxy
+```
 
-## 📚 Documentation
+---
 
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [API Reference](docs/API.md)
-- [UI Screenshot](docs/screenshots/chatforge-ui.png)
+## 🔌 API Reference
+
+### Authentication
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/auth/register` | `POST` | Register new user |
+| `/api/auth/login` | `POST` | Login user |
+| `/api/auth/refresh` | `POST` | Refresh JWT token |
+
+### Chat
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/chat` | `POST` | Send message (HTTP) |
+| `/ws/chat/{conversation_id}` | `WS` | Real-time chat (WebSocket) |
+| `/api/conversations` | `GET` | List conversations |
+| `/api/conversations/{id}` | `GET` | Get conversation |
+| `/api/conversations/{id}/history` | `GET` | Get chat history |
+
+### Models
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/models` | `GET` | List available models |
+| `/api/models/{id}/status` | `GET` | Check model status |
+
+### Example Usage
+
+```bash
+# Register user
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "securepass"}'
+
+# Login and get token
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "securepass"}'
+
+# Send chat message
+curl -X POST http://localhost:3000/api/chat \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "gpt-4", "message": "Hello, world!"}'
+```
+
+---
+
+## 🛠️ Development
+
+### Local Development
+
+```bash
+# Clone the repository
+git clone https://github.com/OneByJorah/ChatForge.git
+cd ChatForge
+
+# Backend setup
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Frontend setup
+cd ../frontend
+npm install
+npm run dev
+```
+
+### Running Tests
+
+```bash
+# Backend tests
+cd backend
+pytest
+
+# Frontend tests
+cd frontend
+npm test
+```
+
+---
+
+## 🔌 Plugin Development
+
+ChatForge supports a plugin system for extending functionality:
+
+```python
+# plugins/my_plugin/plugin.py
+from chatforge.plugins import BasePlugin
+
+class MyPlugin(BasePlugin):
+    name = "my_plugin"
+    version = "1.0.0"
+    
+    def on_message(self, message: str) -> str:
+        # Custom message processing
+        return message.upper()
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🔒 Security
+
+For security concerns, please see [SECURITY.md](SECURITY.md).
+
+---
+
+## 💬 Support
+
+- 📧 Email: support@jorah.one
+- 🐛 Issues: [GitHub Issues](https://github.com/OneByJorah/ChatForge/issues)
+- 📖 Docs: [Documentation](docs/)
 
 ---
 
 <div align="center">
-  <p>⚡ Edge-native AI chat — zero servers, zero cold starts</p>
-  <p><a href="https://github.com/OneByJorah">@OneByJorah</a></p>
+
+  **Built with ❤️ by [Jhonattan L. Jimenez](https://github.com/OneByJorah)**
+
+  [⬆ Back to Top](#-chatforge)
+
 </div>
