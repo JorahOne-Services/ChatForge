@@ -9,10 +9,9 @@
   Build, deploy, and manage intelligent chatbots with multi-model support and enterprise features
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
-  [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-  [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://www.docker.com/)
-  [![WebSocket](https://img.shields.io/badge/WebSocket-Real--Time-blue)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Cloudflare Workers](https://img.shields.io/badge/Cloudflare_Workers-000?style=flat&logo=cloudflare&logoColor=white)](https://workers.cloudflare.com/)
+  [![Workers AI](https://img.shields.io/badge/Workers_AI-F6821F?style=flat&logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers-ai/)
 
   [Features](#-features) • [Quick Start](#-quick-start) • [Architecture](#-architecture) • [API](#-api-reference) • [Contributing](#-contributing)
 
@@ -22,15 +21,15 @@
 
 ## 📸 Screenshots
 
+> Captured from `wrangler dev` serving the real `public/index.html` UI.
+
 <div align="center">
 
-| Chat Interface | Model Selection | Conversation History |
-|----------------|-----------------|---------------------|
-| ![Chat UI](docs/screenshots/chat-ui.png) | ![Models](docs/screenshots/models.png) | ![History](docs/screenshots/history.png) |
+![Chat Interface](docs/screenshots/chat-ui.png)
 
 </div>
 
-> 💡 **Tip:** ChatForge supports real-time streaming responses with WebSocket connections
+> 💡 **Tip:** ChatForge streams assistant replies in real time via Server-Sent Events (SSE).
 
 ---
 
@@ -38,14 +37,12 @@
 
 | Feature | Description |
 |---------|-------------|
-| 🤖 **Multi-Model Support** | OpenAI, Anthropic, Ollama, and custom LLM endpoints |
-| 💬 **Real-Time Chat** | WebSocket-powered instant responses |
-| 📚 **Conversation Management** | Save, search, and organize chat history |
-| 🔐 **Authentication** | JWT-based user authentication |
-| 🎨 **Custom Themes** | Dark/Light mode with customizable UI |
-| 📊 **Usage Analytics** | Track token usage and costs per conversation |
-| 🔌 **Plugin System** | Extend functionality with custom plugins |
-| 🐳 **Docker Ready** | One-command deployment |
+| 🤖 **Workers AI Chat** | Powered by Cloudflare Workers AI (`@cf/meta/llama-3.1-8b-instruct-fp8`) |
+| 💬 **Real-Time Streaming** | Assistant replies stream token-by-token via Server-Sent Events (SSE) |
+| 🔒 **Security Headers** | HSTS, X-Frame-Options, nosniff, referrer-policy, permissions-policy |
+| 📦 **Zero-Server Ops** | Runs entirely on Cloudflare Workers + static assets (no VM to manage) |
+
+> This is a focused Cloudflare Workers template. It does **not** include JWT auth, multi-model provider switching, conversation persistence, theming, analytics, or a plugin system — those are not in the code.
 
 ---
 
@@ -53,72 +50,54 @@
 
 ### Prerequisites
 
-- Docker & Docker Compose
-- Git
-- API keys for desired LLM providers (optional for local models)
+- [Node.js 18+](https://nodejs.org/) and npm
+- A Cloudflare account (free tier works) with Workers AI enabled
+- `CLOUDFLARE_API_TOKEN` with Workers deploy permissions (for `wrangler dev`/`deploy`)
 
-### Installation
+### Local Development
 
 ```bash
-# Clone the repository
 git clone https://github.com/OneByJorah/ChatForge.git
 cd ChatForge
-
-# Start with Docker
-docker compose up -d
+npm install
+npm run dev          # wrangler dev — serves the UI + /api/chat locally
 ```
 
-### Access the Platform
+Open **http://localhost:8787** in your browser.
 
-Open **http://localhost:3000** in your browser
+> Deploy: `npx wrangler deploy` (publishes the Worker + assets to your Cloudflare account).
 
 ### Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CHATFORGE_PORT` | `3000` | Application port |
-| `DATABASE_URL` | `sqlite:///./chatforge.db` | Database connection |
-| `JWT_SECRET` | `your-secret-key` | Authentication secret |
-| `OPENAI_API_KEY` | - | OpenAI API key (optional) |
-| `ANTHROPIC_API_KEY` | - | Anthropic API key (optional) |
+| `CLOUDFLARE_API_TOKEN` | — | Token with Workers deploy rights (for `wrangler dev`/`deploy`) |
+| `MODEL_ID` | `@cf/meta/llama-3.1-8b-instruct-fp8` | Workers AI model (set in `src/index.ts`) |
+
+> Configuration lives in `wrangler.jsonc` (the `ai` binding) and `src/index.ts` — there is no `.env`/database for this template. |
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                       ChatForge                             │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   ┌─────────┐      ┌─────────┐      ┌─────────────────┐   │
-│   │ Browser │ ───▶ │  Nginx  │ ───▶ │  FastAPI Server  │   │
-│   │   SPA   │ ◀─── │   SSL   │ ◀─── │    WebSocket     │   │
-│   └─────────┘      └─────────┘      └────────┬────────┘   │
-│                                               │             │
-│                                   ┌───────────┴───────────┐ │
-│                                   │                       │ │
-│                        ┌──────────┴──────────┐           │ │
-│                        │                     │           │ │
-│                        ▼                     ▼           │ │
-│                 ┌──────────┐          ┌──────────┐      │ │
-│                 │  SQLite  │          │   LLM    │      │ │
-│                 │  Users   │          │ Providers│      │ │
-│                 │  History │          │ Gateway  │      │ │
-│                 └──────────┘          └──────────┘      │ │
-│                                                           │ │
-└─────────────────────────────────────────────────────────────┘
+Browser ──HTTP/SSE──▶ Cloudflare Worker (src/index.ts)
+                        ├── GET  /            → static UI (public/index.html)
+                        └── POST /api/chat    → Workers AI (@cf/meta/llama-3.1-8b-instruct-fp8)
+                                              → streams reply via Server-Sent Events
 ```
+
+No database, no auth layer, no separate backend process — everything runs on Cloudflare's Workers runtime.
 
 ### Tech Stack
 
 | Component | Technology |
 |-----------|------------|
-| **Backend** | Python 3.10+, FastAPI, WebSocket |
-| **Frontend** | React 18, TypeScript, Tailwind CSS |
-| **Database** | SQLite / PostgreSQL |
-| **Auth** | JWT + bcrypt |
-| **LLM Gateway** | LiteLLM / Custom adapters |
+| **Runtime** | Cloudflare Workers |
+| **Language** | TypeScript |
+| **AI** | Cloudflare Workers AI (`@cf/meta/llama-3.1-8b-instruct-fp8`) |
+| **UI** | Static HTML/CSS/JS (`public/`) |
+| **Tooling** | Wrangler, Vitest (worker pool) |
 
 ---
 
@@ -126,132 +105,55 @@ Open **http://localhost:3000** in your browser
 
 ```
 ChatForge/
-├── backend/                  # FastAPI backend
-│   ├── main.py              # Application entry
-│   ├── routers/             # API routes
-│   │   ├── auth.py          # Authentication endpoints
-│   │   ├── chat.py          # Chat endpoints
-│   │   └── models.py        # Model management
-│   ├── models/              # SQLAlchemy models
-│   ├── services/            # Business logic
-│   │   ├── llm.py           # LLM provider integration
-│   │   └── conversation.py  # Conversation management
-│   └── websocket/           # WebSocket handlers
-├── frontend/                # React SPA
-│   ├── src/
-│   │   ├── components/      # UI components
-│   │   ├── pages/           # Page components
-│   │   └── hooks/           # Custom hooks
-│   └── public/              # Static assets
-├── plugins/                 # Plugin system
-├── docs/                    # Documentation
-│   └── screenshots/         # UI screenshots
-├── docker-compose.yml       # Docker deployment
-└── nginx.conf               # Reverse proxy
+├── src/
+│   ├── index.ts             # Worker entry (fetch handler, /api/chat SSE)
+│   ├── types.ts             # ChatMessage / Env types
+│   └── __tests__/index.test.ts
+├── public/
+│   ├── index.html           # Chat UI
+│   └── chat.js              # Frontend logic
+├── docs/                    # Architecture / API docs
+├── wrangler.jsonc           # Worker config (AI binding, assets)
+├── package.json
+└── tsconfig.json
 ```
 
 ---
 
 ## 🔌 API Reference
 
-### Authentication
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/auth/register` | `POST` | Register new user |
-| `/api/auth/login` | `POST` | Login user |
-| `/api/auth/refresh` | `POST` | Refresh JWT token |
-
 ### Chat
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/chat` | `POST` | Send message (HTTP) |
-| `/ws/chat/{conversation_id}` | `WS` | Real-time chat (WebSocket) |
-| `/api/conversations` | `GET` | List conversations |
-| `/api/conversations/{id}` | `GET` | Get conversation |
-| `/api/conversations/{id}/history` | `GET` | Get chat history |
+| `/api/chat` | `POST` | Body `{"messages": [...]}` → streams the assistant reply as SSE (`data: {...}` chunks) |
 
-### Models
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/models` | `GET` | List available models |
-| `/api/models/{id}/status` | `GET` | Check model status |
+No authentication, conversation persistence, or model-listing endpoints exist in this template.
 
 ### Example Usage
 
 ```bash
-# Register user
-curl -X POST http://localhost:3000/api/auth/register \
+# Stream a chat reply (SSE)
+curl -N -X POST http://localhost:8787/api/chat \
   -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "securepass"}'
-
-# Login and get token
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email": "user@example.com", "password": "securepass"}'
-
-# Send chat message
-curl -X POST http://localhost:3000/api/chat \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"model": "gpt-4", "message": "Hello, world!"}'
+  -d '{"messages": [{"role": "user", "content": "Hello!"}]}'
 ```
 
 ---
 
 ## 🛠️ Development
 
-### Local Development
-
 ```bash
-# Clone the repository
 git clone https://github.com/OneByJorah/ChatForge.git
 cd ChatForge
-
-# Backend setup
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-
-# Frontend setup
-cd ../frontend
 npm install
-npm run dev
+
+npm run dev        # wrangler dev (UI + /api/chat on :8787)
+npm run typecheck  # tsc --noEmit
+npm test           # vitest (worker integration tests)
 ```
 
-### Running Tests
-
-```bash
-# Backend tests
-cd backend
-pytest
-
-# Frontend tests
-cd frontend
-npm test
-```
-
----
-
-## 🔌 Plugin Development
-
-ChatForge supports a plugin system for extending functionality:
-
-```python
-# plugins/my_plugin/plugin.py
-from chatforge.plugins import BasePlugin
-
-class MyPlugin(BasePlugin):
-    name = "my_plugin"
-    version = "1.0.0"
-    
-    def on_message(self, message: str) -> str:
-        # Custom message processing
-        return message.upper()
-```
+Deploy to Cloudflare: `npx wrangler deploy`.
 
 ---
 
