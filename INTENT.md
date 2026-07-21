@@ -95,7 +95,7 @@ Evidence:
 - **Published as Cloudflare template** (`package.json` → `cloudflare.publish: true`) — intended for public consumption
 - **Observability enabled** (`wrangler.jsonc` → `observability.enabled: true`) — production monitoring configured
 - **Security scanning active** — CodeQL analysis (weekly + push/PR), Dependabot (weekly for npm, pip, docker, github-actions)
-- **Security policy defined** — SECURITY.md with 90-day disclosure timeline, dedicated email (j1admin@onebyjorah.com)
+- **Security policy defined** — SECURITY.md with 90-day disclosure timeline, dedicated email (info@jorahone.com)
 - **Community governance** — CODE_OF_CONDUCT, CONTRIBUTING, issue/PR templates
 - **Testing infrastructure** — Vitest with `@cloudflare/vitest-pool-workers`, 8 unit tests covering routing, streaming, error handling, system prompt injection
 - **Deployment verified** — `deploy_log.txt` shows successful dry-run (21.71 KiB upload, 5.65 KiB gzipped)
